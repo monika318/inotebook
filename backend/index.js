@@ -1,0 +1,19 @@
+const connectToMongo = require('./db');
+const express = require('express')
+const app = express()
+
+
+connectToMongo();
+const port = 3000
+
+app.get('/', (req, res) => {
+    res.send('Hello World! monika')
+})
+
+app.get('/about', (req, res) => {
+    res.send('Hello about')
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port http://localhost:${port}`)
+})
