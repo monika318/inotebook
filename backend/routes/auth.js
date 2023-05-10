@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const Users = require('../models/Users');
+const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = "ThisisaTrail";
 
 //Create a user using :POST "/api/auth/createuser". Doesn't require Authentication
 router.post('/createuser',
@@ -20,12 +24,26 @@ router.post('/createuser',
             if (user) {
                 return res.status(400).json({ errors: "Sorry a user with this email already exists" });
             }
+
+            //salt and pepper concept
+            const salt = await bcrypt.genSalt(10);
+            //await ensures this line has to be finished to go further down the code
+            const secPass = await bcrypt.hash(req.body.password, salt);
+
+            //Create and new user
             user = await Users.create({
                 name: req.body.name,
                 email: req.body.email,
-                password: req.body.password
-            })
-            res.json(user)
+                password: secPass
+            });
+            const data = {
+                user: {
+                    id: user.id
+                }
+            }
+            const token = jwt.sign(data, JWT_SECRET);
+            res.json({ token });
+
         } catch (error) {
             console.error(error.message);
             return res.status(500).send('some error occured');
