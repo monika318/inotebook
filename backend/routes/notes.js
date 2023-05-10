@@ -49,5 +49,33 @@ router.get('/addnote', fetchUser,
     })
 
 
+// Route 3: Update the note:PUT "/api/notes/updatenote".  require login
+router.put('/updatenote/:id', fetchUser,
+    body('title', 'Enter a valid title').isLength({ min: 3 }),
+    body('description', 'Description must be atleast 5 characters').isLength({ min: 5 }),
+    // body('name', 'Enter Valid name').isLength({ min: 3 }),
+    async (req, res) => {
+        const { title, description, tag } = req.body;
+        //create new note
+        const newNote = new Notes();
+        if (title) { newNote.title = title };
+        if (description) { newNote.description = description };
+        if (tag) { newNote.tag = tag };
+
+
+        //find the note to be updated
+        let note = await Notes.findById(req.params.id);
+        if (!note) {
+            return res.status(404).send("Not Found")
+        }
+        if (note.user.toString() !== req.user.id) {
+            return res.status(401).send("Not allowed")
+        }
+        newNote._id = note._id; //explicitly add the id 
+        note = await Notes.findByIdAndUpdate(req.params.id, { $set: newNote }, { new: true })
+        res.json(note)
+
+    })
+
 
 module.exports = router
