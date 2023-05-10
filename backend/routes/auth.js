@@ -3,7 +3,9 @@ const router = express.Router();
 const Users = require('../models/Users');
 const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
+const fetchUser = require("../middleware/fetchUser");
 const jwt = require('jsonwebtoken');
+const User = require('../models/Users');
 
 const JWT_SECRET = "ThisisaTrail";
 
@@ -41,8 +43,8 @@ router.post('/createuser',
                     id: user.id
                 }
             }
-            const token = jwt.sign(data, JWT_SECRET);
-            res.json({ token });
+            const authtoken = jwt.sign(data, JWT_SECRET);
+            res.json({ authtoken });
 
         } catch (error) {
             console.error(error.message);
@@ -75,8 +77,8 @@ router.post('/login',
                     id: user.id
                 }
             }
-            const token = jwt.sign(data, JWT_SECRET);
-            res.json({ token });
+            const authtoken = jwt.sign(data, JWT_SECRET);
+            res.json({ authtoken });
         }
         catch (error) {
             console.error(error.message);
@@ -84,6 +86,22 @@ router.post('/login',
         }
 
     })
+
+//Route 3: Get logged in user details using :POST "/api/auth/getuser". Login Required
+router.post('/getuser', fetchUser,
+    async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const user = await User.findById(userId).select("-password"); //all data except password
+            res.send(user)
+        }
+        catch (error) {
+            console.error(error.message);
+            return res.status(500).send('Internal Server error');
+        }
+    })
+
+
 
 
 module.exports = router
