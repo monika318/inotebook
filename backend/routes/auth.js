@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = "ThisisaTrail";
 
-//Create a user using :POST "/api/auth/createuser". Doesn't require Authentication
+// Route 1: Create a user using :POST "/api/auth/createuser". Doesn't require Authentication
 router.post('/createuser',
     body('email', 'Enter a valid Email').isEmail(),
     body('password', 'Password must be atleast 5 characters').isLength({ min: 5 }),
@@ -49,5 +49,41 @@ router.post('/createuser',
             return res.status(500).send('some error occured');
         }
     });
+
+//Route 2: Authenticate a user using :POST "/api/auth/login". No login Required
+router.post('/login',
+    body('email', 'Enter a valid Email').isEmail(),
+    body('password', 'Password cannot be blank').exists(),
+    async (req, res) => {
+        //If there are error return bad request and the error
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) { //if there is error
+            return res.status(400).json({ errors: errors.array() });
+        }
+        const { email, password } = req.body; //user detail from the frontend
+        try {
+            let user = await Users.findOne({ email });//bringing user from the database through the schema
+            if (!user) {
+                return res.status(400).json('Please enter correct credentials');
+            }
+            const passwordCompare = await bcrypt.compare(password, user.password);
+            if (!passwordCompare) {
+                return res.status(400).json('Please enter correct credentials');
+            }
+            const data = {
+                user: {
+                    id: user.id
+                }
+            }
+            const token = jwt.sign(data, JWT_SECRET);
+            res.json({ token });
+        }
+        catch (error) {
+            console.error(error.message);
+            return res.status(500).send('Internal Server error');
+        }
+
+    })
+
 
 module.exports = router
