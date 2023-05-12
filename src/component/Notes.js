@@ -3,7 +3,7 @@ import NoteContext from '../context/notes/NoteContext';
 import NoteItem from './NoteItem';
 import Addnote from './Addnote';
 
-const Notes = () => {
+const Notes = (props) => {
     const context = useContext(NoteContext);
     const { notes, getNotes, editNote } = context;
     const [note, setNote] = useState({ id: "", etitle: "", edescription: "", etag: "" })
@@ -20,14 +20,17 @@ const Notes = () => {
         // getNotes();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
     const updateNote = (currentnote) => {
         ref.current.click();
         setNote({ id: currentnote._id, etitle: currentnote.title, edescription: currentnote.description, etag: currentnote.tag })
+
     }
     const handleClick = (e) => {
         // console.log("updating the note", note)
         editNote(note.id, note.etitle, note.edescription, note.etag)
         refclose.current.click()
+        props.showAlert("Updated Successfully ", "success");
         // editNote(note.title, note.description, note.tag);
     }
     const onChange = (e) => {
@@ -35,7 +38,7 @@ const Notes = () => {
     }
     return (
         <div className="container">
-            <Addnote />
+            <Addnote showAlert={props.showAlert} />
             <button ref={ref} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Launch demo modal
             </button>
@@ -76,7 +79,7 @@ const Notes = () => {
                     {notes.length === 0 && 'Not Notes to Display'}
                 </div>
                 {notes.map((note) => {
-                    return <NoteItem key={note._id} updateNote={updateNote} note={note}></NoteItem>
+                    return <NoteItem key={note._id} updateNote={updateNote} note={note} showAlert={props.showAlert}></NoteItem>
                 })}
             </div>
         </div>

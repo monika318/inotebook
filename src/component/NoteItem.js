@@ -8,6 +8,7 @@ const NoteItem = (props) => {
 
     const handledelete = () => {
         deleteNote(note._id);
+        props.showAlert("Deleted Successfully ", "success");
     }
 
     const handleEdit = () => {
