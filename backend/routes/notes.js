@@ -21,7 +21,7 @@ router.get('/getAllNotes', fetchUser,
 
 
 // Route 2: Add the note:POST "/api/notes/addnote".  require login
-router.get('/addnote', fetchUser,
+router.post('/addnote', fetchUser,
     body('title', 'Enter a valid title').isLength({ min: 3 }),
     body('description', 'Description must be atleast 5 characters').isLength({ min: 5 }),
     // body('name', 'Enter Valid name').isLength({ min: 3 }),
