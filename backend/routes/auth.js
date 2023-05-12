@@ -17,14 +17,18 @@ router.post('/createuser',
     async (req, res) => {
         //if there are error return bad request and the error
         const errors = validationResult(req);
+        let success = false
         if (!errors.isEmpty()) { //if there is error
-            return res.status(400).json({ errors: errors.array() });
+            success = false
+            return res.status(400).json({ success, errors: errors.array() });
         }
         //Check whether the user with the same email exists already
         try {
             let user = await Users.findOne({ email: req.body.email });
             if (user) {
-                return res.status(400).json({ errors: "Sorry a user with this email already exists" });
+                success = false
+
+                return res.status(400).json({ success, errors: "Sorry a user with this email already exists" });
             }
 
             //salt and pepper concept
@@ -43,9 +47,9 @@ router.post('/createuser',
                     id: user.id
                 }
             }
+            success = true
             const authtoken = jwt.sign(data, JWT_SECRET);
-            res.json({ authtoken });
-
+            res.json({ success, authtoken });
         } catch (error) {
             console.error(error.message);
             return res.status(500).send('some error occured');
