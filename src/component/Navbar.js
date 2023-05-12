@@ -28,8 +28,8 @@ const Navbar = () => {
                         </ul>
                         <form className="d-flex" role="search">
                             {/* <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" /> */}
-                            <Link className="btn btn-primary mx-2 signButton" to='/login' type="submit">SignUp</Link>
-                            <Link className="btn btn-primary mx-2 signButton" to='/signup' type="submit">LogIn</Link>
+                            <Link className="btn btn-primary mx-2 signButton" to='/signup' type="submit">SignUp</Link>
+                            <Link className="btn btn-primary mx-2 signButton" to='/login' type="submit">LogIn</Link>
                         </form>
                     </div>
                 </div>
